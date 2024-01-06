@@ -1,6 +1,6 @@
 // main.dart
 import 'package:flutter/material.dart';
-import 'restaurant_menu_page.dart';
+import 'RestaurantMenuPage.dart';
 
 void main() => runApp(MyApp());
 
