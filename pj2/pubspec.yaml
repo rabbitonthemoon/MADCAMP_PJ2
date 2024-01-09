@@ -72,6 +72,7 @@ flutter:
     - assets/images/restaurant3.png
     - assets/images/restaurant4.png
     - assets/images/restaurant5.png
+    - assets/images/icon.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
