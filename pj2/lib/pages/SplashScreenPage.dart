@@ -32,20 +32,11 @@ class _SplashScreenWidgetState extends State<SplashScreenWidget> {
     children: [
       Padding(
         padding: EdgeInsets.only(bottom: 10), // 원하는 패딩 값을 설정
-        child: Image.asset('assets/images/icon.png', width: 200, height: 200,),
+        child: Image.asset('assets/images/cmc1.png', width: 200, height: 200,),
       ),
-      Text(
-        "카메추",
-        style: TextStyle(
-          //fontFamily: 'NotoSans',
-          fontSize: 25.0,
-        ),
-      ),
-      // 추가적인 자식 위젯들을 여기에 배치할 수 있습니다.
     ],
   ),
 )
     );
   }
 }
-

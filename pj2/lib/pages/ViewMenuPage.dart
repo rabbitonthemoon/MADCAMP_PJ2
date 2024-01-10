@@ -22,7 +22,7 @@ class ViewMenuPage extends StatelessWidget {
     {
       'image': 'assets/images/restaurant1.png',
       'name': '휴김밥 전문점',
-      //식당별 메뉴와 가격 정보를 DB에서 불러와야 함
+      'type': '분식',
       'menu': [ 
         {'name': '즉석김밥', 'price': 2000}, 
         {'name': '참치김밥', 'price': 3000},
@@ -58,6 +58,7 @@ class ViewMenuPage extends StatelessWidget {
     {
       'image': 'assets/images/restaurant2.png',
       'name': '오늘도 든든',
+      'type': '한식',
       'menu': [
         {'name': '소고기된짱짜글이', 'price': 5500},
         {'name': '돼지김치짜글이+계란밥', 'price': 5500},
@@ -72,6 +73,7 @@ class ViewMenuPage extends StatelessWidget {
     {
       'image': 'assets/images/restaurant3.png',
       'name': '캠토',
+      'type': '토스트',
       'menu': [
         {'name': '에그토스트', 'price': 2300},
         {'name': '야채토스트', 'price': 2500},
@@ -102,6 +104,7 @@ class ViewMenuPage extends StatelessWidget {
     {
       'image': 'assets/images/restaurant4.png',
       'name': '웰차이',
+      'type': '중식',
       'menu': [
         {'name': '짜장면', 'price': 5000},
         {'name': '간짜장', 'price': 6000},
@@ -122,6 +125,7 @@ class ViewMenuPage extends StatelessWidget {
     {
       'image': 'assets/images/restaurant5.png',
       'name': '리틀하노이',
+      'type': '쌀국수',
       'menu': [
         {'name': '쌀국수', 'price': 3900},
         {'name': '양지쌀국수', 'price': 5000},
@@ -144,18 +148,25 @@ class ViewMenuPage extends StatelessWidget {
     },
   ];
 
+  int getTotalPrice(List<Map<String, dynamic>> menuItems) {
+    int totalPrice = 0;
+    for (var item in menuItems) {
+      totalPrice += item['price'] as int;
+    }
+    return totalPrice;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-                  '식당',
-                  style: TextStyle(
-                    // fontSize: 15.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  )
-              ),
+          '식당',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          )
+        ),
         backgroundColor: Color(0xffFF874D)
       ),
       body: ListView.builder(
@@ -171,6 +182,7 @@ class ViewMenuPage extends StatelessWidget {
                     restaurantName: restaurants[index]['name']! as String,
                     restaurantImage: restaurants[index]['image']! as String,
                     menuItems: List<Map<String, dynamic>>.from(restaurants[index]['menu']),
+                    restaurantType: restaurants[index]['type']! as String,
                   ),
                 ),
               );
@@ -189,7 +201,7 @@ class ViewMenuPage extends StatelessWidget {
                   height: 200,
                 ),
                 subtitle: Container(
-                  color: Color(0xffFF874D).withOpacity(0.3),
+                  color: Color(0xffFFCDBA),
                   padding: EdgeInsets.all(8.0),
                   child: Text(
                     restaurants[index]['name']!,
@@ -197,9 +209,9 @@ class ViewMenuPage extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
-                      ),
                     ),
                   ),
+                ),
               ),
             ),
           );

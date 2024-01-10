@@ -1,14 +1,113 @@
 // restaurant_menu_page.dart
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
+import 'package:pj2/pages/cart_manager.dart';
 
 // RestaurantMenuPage 클래스
-class RestaurantMenuPage extends StatelessWidget {
+class RestaurantMenuPage extends StatefulWidget {
   final String restaurantName;
   final String restaurantImage;
   final List<Map<String, dynamic>> menuItems;
+  final String restaurantType;
 
-  RestaurantMenuPage({required this.restaurantName, required this.restaurantImage, required this.menuItems});
+  RestaurantMenuPage({required this.restaurantName, required this.restaurantImage, required this.menuItems, required this.restaurantType});
+
+  @override
+  _RestaurantMenuPageState createState() => _RestaurantMenuPageState();
+}
+
+class _RestaurantMenuPageState extends State<RestaurantMenuPage> {
+  final CartManager cartManager = CartManager();
+
+  void addToCart(Map<String, dynamic> menuItem) {
+    cartManager.addToCart(menuItem);
+    // 화면 갱신
+    setState(() {});
+  }
+
+  void showCartDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('장바구니'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: cartManager.cartItems.map((item) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(item['name']),
+                    IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        // 장바구니에서 해당 항목 제거
+                        setState(() {
+                          cartManager.removeFromCart(item);
+                        });
+                        Navigator.of(context).pop();
+                        showCartDialog(context);
+                      },
+                    ),
+                  ],
+                );
+              }
+            ).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('취소하기'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('주문하기'),
+              onPressed: () {
+                // 주문 로직 추가...
+                Navigator.of(context).pop();
+                showPaymentDialog(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showPaymentDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('결제하기'),
+          content: Text('총 가격: ${cartManager.getTotalPrice()}원'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('취소하기'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('결제하기'),
+              onPressed: () {
+                // 결제 메시지
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('결제되었습니다')),
+                );
+                cartManager.clearCart();
+                setState(() {});
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +132,10 @@ class RestaurantMenuPage extends StatelessWidget {
             right: 0,
             height: 230,
             child: Image.asset(
-              restaurantImage,
+              widget.restaurantImage,
               fit: BoxFit.cover,
             ),
           ),
-        
           // Restaurant Name Box
           Positioned(
             top: MediaQuery.of(context).padding.top + 180.0,
@@ -46,16 +144,22 @@ class RestaurantMenuPage extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(10.0),
               decoration: BoxDecoration(
-                color: Color.fromARGB(255, 243, 243, 243).withOpacity(0.7),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(10.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 2,
+                    blurRadius: 4,
+                    offset: Offset(0, 3),
+                  ),
+                ],
               ),
-              
-              
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,  // 세로 중앙 정렬
                 children: [
                   Text(
-                    restaurantName,
+                    widget.restaurantName,
                     style: TextStyle(
                       color: Colors.black,
                       // fontFamily: 'NotoSans',
@@ -64,12 +168,8 @@ class RestaurantMenuPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '010-1111-1111', //식당별 연락처 정보 로드해야 함
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w200,
-                    ),
+                    widget.restaurantType, // Display the restaurant type
+                    style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w300),
                   ),
                 ],
               ),
@@ -83,72 +183,43 @@ class RestaurantMenuPage extends StatelessWidget {
             right: 0,
             bottom: 0,
             child: ListView.builder(
-              itemCount: menuItems.length,
+              itemCount: widget.menuItems.length,
               itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    showOverlay(context, menuItems[index]['name'], 5); // 여기서 5는 임의의 숫자
-                  },
-                  child: ListTile(
-                    title: Text('${menuItems[index]['name']}'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${menuItems[index]['price']}원',
-                          style: TextStyle(fontSize: 15.0),
-                        ),
-                        SizedBox(width: 4),
-                        IconButton(
-                          icon: Icon(Icons.add_shopping_cart, color: Color(0xffFF874D)),
-                          onPressed: () {
-                            // 주문 로직 추가...
-                          },
-                        ),
-                      ],
+                return ListTile(
+                title: Text('${widget.menuItems[index]['name']}'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('${widget.menuItems[index]['price']}원', style: TextStyle(fontSize: 15.0)),
+                    SizedBox(width: 4),
+                    IconButton(
+                      icon: Icon(Icons.add_shopping_cart, color: Color(0xffFF874D)),
+                      onPressed: () {
+                        addToCart(widget.menuItems[index]);
+                      },
                     ),
-                  ),
-                );
-              },
-            ),
+                  ],
+                ),
+              );
+            },
           ),
-        ],
-      ),
-    );
-  }
-
-  // Overlay를 보여주는 함수
-  void showOverlay(BuildContext context, String menuName, int numberOfTimesEaten) {
-    OverlayEntry overlayEntry;
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 300.0,
-        left: 20.0,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Text(
-              '친구가 $numberOfTimesEaten번 먹은 메뉴!', //DB에서 조회해야 함
-              style: TextStyle(fontSize: 13, color: Colors.white),
-            ),
-          ),
+        ),
+      ],
+    ),
+      floatingActionButton: badges.Badge(
+        position: badges.BadgePosition.topEnd(top: 0, end: 3),
+        animationDuration: Duration(milliseconds: 300),
+        animationType: badges.BadgeAnimationType.slide,
+        badgeContent: Text(
+          cartManager.itemCount.toString(),
+          style: TextStyle(color: Colors.white),
+        ),
+        child: FloatingActionButton(
+          onPressed: () => showCartDialog(context),
+          child: Icon(Icons.shopping_cart),
+          backgroundColor: Color(0xFFFFCDBA),
         ),
       ),
     );
-
-
-    Overlay.of(context)?.insert(overlayEntry);
-
-    // 일정 시간 후 Overlay 제거
-    Future.delayed(Duration(seconds: 1), () {
-      overlayEntry.remove();
-    });
   }
-
 }
