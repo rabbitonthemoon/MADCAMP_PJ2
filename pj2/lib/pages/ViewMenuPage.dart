@@ -155,53 +155,60 @@ class ViewMenuPage extends StatelessWidget {
     }
     return totalPrice;
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '식당',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          )
-        ),
-        backgroundColor: Color(0xffFF874D)
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    extendBodyBehindAppBar: true,
+    appBar: AppBar(
+      title: Text(
+        '식당',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        )
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(0),
-        itemCount: restaurants.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RestaurantMenuPage(
-                    restaurantName: restaurants[index]['name']! as String,
-                    restaurantImage: restaurants[index]['image']! as String,
-                    menuItems: List<Map<String, dynamic>>.from(restaurants[index]['menu']),
-                    restaurantType: restaurants[index]['type']! as String,
+      backgroundColor: Color(0xffFF874D),
+      elevation: 0, // Set elevation to 0 for a flat design
+    ),
+    body: ListView.separated( // Use separated to include space between items
+      padding: EdgeInsets.zero,
+      itemCount: restaurants.length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RestaurantMenuPage(
+                  restaurantName: restaurants[index]['name']! as String,
+                  restaurantImage: restaurants[index]['image']! as String,
+                  menuItems: List<Map<String, dynamic>>.from(restaurants[index]['menu']),
+                  restaurantType: restaurants[index]['type']! as String,
+                ),
+              ),
+            );
+          },
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 5,
+            margin: index == 0 // Conditional margin for the first item
+              ? EdgeInsets.only(top: AppBar().preferredSize.height + 10, left: 8, right: 8) // Additional top padding for the first card
+              : EdgeInsets.symmetric(horizontal: 8),
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                  child: Image.asset(
+                    restaurants[index]['image']!,
+                    fit: BoxFit.cover,
+                    height: 200,
+                    width: double.infinity,
                   ),
                 ),
-              );
-            },
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), 
-              ),
-              elevation: 5, // 그림자 효과
-              margin: EdgeInsets.all(8.0),
-              child: ListTile(
-                contentPadding: EdgeInsets.all(0),
-                title: Image.asset(
-                  restaurants[index]['image']!,
-                  fit: BoxFit.cover,
-                  height: 200,
-                ),
-                subtitle: Container(
-                  color: Color(0xffFFCDBA),
+                Container(
+                  // color: Color(0xffFFCDBA),
                   padding: EdgeInsets.all(8.0),
                   child: Text(
                     restaurants[index]['name']!,
@@ -212,11 +219,13 @@ class ViewMenuPage extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+      separatorBuilder: (context, index) => SizedBox(height: 10), // Add space between the cards
+    ),
+  );
+}
 }
